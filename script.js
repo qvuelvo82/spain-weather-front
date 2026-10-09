@@ -7,8 +7,38 @@ let datos;
 searchBtn.addEventListener('click', () => {
     const lista = document.getElementById('municipios-list');
     lista.innerHTML = '';
-    cargarMunicipios();
+    const city = cityInput.value.trim();
+    if (city.valueOf().length>0) {
+        cargarMunicipio(city);
+    } else {
+        cargarMunicipios();
+    }
 });
+async function cargarMunicipio(city) {
+    const lista = document.getElementById('municipios-list');
+    let response;
+    try {
+        response = await fetch(
+            'http://localhost:8080/municipios/population/' + city,
+            {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + apiKey
+                }
+            }
+        )
+        datos = await response.json();
+    } catch (error) {
+        console.error(error);
+        lista.innerHTML =
+            '<li>Error el municipio.</li>';
+    }
+    lista.innerHTML = '';
+    const li = document.createElement('li');
+    li.textContent = `${datos.nombre} - ${datos.num_hab} habitantes`;
+    lista.appendChild(li);
+}
+
 
 async function cargarMunicipios() {
     const lista = document.getElementById('municipios-list');
